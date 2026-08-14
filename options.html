@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ADO Quick Task settings</title>
+    <link rel="stylesheet" href="popup.css" />
+    <style>
+      body {
+        width: auto;
+        max-width: 440px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Settings</h1>
+    <p class="meta">
+      Uses your Azure DevOps login from the ticket tab. Add a PAT only if create
+      fails with 401/403.
+    </p>
+    <form id="form">
+      <label>
+        Personal access token <span class="optional">optional</span>
+        <input id="pat" type="password" autocomplete="off" />
+      </label>
+      <p class="meta">Scope: Work Items (Read, Write). Stored only on this computer.</p>
+      <button id="submit" type="submit">Save</button>
+    </form>
+    <p id="status" class="status" role="status"></p>
+    <script src="options.js"></script>
+  </body>
+</html>

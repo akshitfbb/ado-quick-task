@@ -1,0 +1,154 @@
+:root {
+  --bg: #f3f2f1;
+  --panel: #ffffff;
+  --ink: #201f1e;
+  --muted: #605e5c;
+  --line: #e1dfdd;
+  --accent: #0f6cbd;
+  --accent-hover: #115ea3;
+  --ok: #0b6a0b;
+  --err: #a4262c;
+  --font: "Segoe UI", "Segoe UI Web (West European)", Calibri, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 380px;
+  margin: 0;
+  padding: 16px;
+  background: var(--bg);
+  color: var(--ink);
+  font: 13px/1.4 var(--font);
+}
+
+header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.kicker {
+  margin: 0 0 2px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+#options {
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  padding: 0;
+}
+
+.parent {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.meta {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.parent-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.status {
+  margin: 0 0 10px;
+  min-height: 1.2em;
+}
+
+.status.error {
+  color: var(--err);
+}
+
+.status.ok {
+  color: var(--ok);
+}
+
+form {
+  display: grid;
+  gap: 10px;
+}
+
+label {
+  display: grid;
+  gap: 4px;
+  color: var(--ink);
+}
+
+.preview {
+  margin: 0;
+  padding: 8px 10px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  font-weight: 600;
+}
+
+.optional {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+input[type="number"] {
+  width: 100%;
+  border: 1px solid #8a8886;
+  padding: 7px 8px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--panel);
+}
+
+input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  border-color: var(--accent);
+}
+
+#submit {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 8px 12px;
+  font-weight: 600;
+}
+
+#submit:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+#submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.created {
+  margin: 10px 0 0;
+}
+
+.created a {
+  color: var(--accent);
+}

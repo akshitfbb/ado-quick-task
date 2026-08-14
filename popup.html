@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ADO Quick Task</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <p class="kicker">Child task</p>
+        <h1>ADO Quick Task</h1>
+      </div>
+      <button id="options" type="button" title="Settings">Settings</button>
+    </header>
+
+    <section id="parent" class="parent" hidden>
+      <p id="parent-meta" class="meta"></p>
+      <p id="parent-title" class="parent-title"></p>
+    </section>
+
+    <p id="status" class="status" role="status"></p>
+
+    <form id="form" hidden>
+      <p class="meta">Task title</p>
+      <p id="task-title" class="preview"></p>
+      <label>
+        Effort
+        <input id="effort" type="number" min="0" step="any" required />
+      </label>
+      <button id="submit" type="submit">Create child task</button>
+    </form>
+
+    <p id="created" class="created" hidden></p>
+    <script src="popup.js"></script>
+  </body>
+</html>
