@@ -2,10 +2,7 @@
   const API = "7.1";
   const TASK_TYPE = "Task";
   const TITLE_SUFFIX = "AWS Effort";
-  const HOUR_FIELDS = [
-    "Microsoft.VSTS.Scheduling.OriginalEstimate",
-    "Microsoft.VSTS.Scheduling.RemainingWork",
-  ];
+  const HOUR_FIELDS = ["Microsoft.VSTS.Scheduling.CompletedWork"];
 
   const parseLocation = (href = location.href) => {
     const url = new URL(href);
@@ -129,14 +126,10 @@
     }));
   };
 
-  const isHourField = (field) => {
+  const isCompletedField = (field) => {
     const name = String(field.name || "").trim();
     const ref = String(field.referenceName || "");
-    if (HOUR_FIELDS.includes(ref)) return true;
-    if (/effort\s*\(\s*hours?\s*\)/i.test(name)) return true;
-    if (/^original estimate$/i.test(name)) return true;
-    if (/^remaining( work)?$/i.test(name)) return true;
-    return false;
+    return ref === "Microsoft.VSTS.Scheduling.CompletedWork" || /^completed( work)?$/i.test(name);
   };
 
   const resolveHourFields = async (ctx, auth) => {
@@ -148,10 +141,10 @@
       } catch {
         payload = await adoFetch(`${base}?api-version=${API}`, {}, auth);
       }
-      const refs = [...new Set(listTypeFields(payload).filter(isHourField).map((f) => f.referenceName).filter(Boolean))];
+      const refs = [...new Set(listTypeFields(payload).filter(isCompletedField).map((f) => f.referenceName).filter(Boolean))];
       if (refs.length) return refs;
     } catch {
-      // Use the standard Effort (Hours) fields.
+      // Use Completed Work.
     }
     return [...HOUR_FIELDS];
   };
@@ -204,14 +197,8 @@
       let auth = token ? { token } : {};
       const hourFields = await resolveHourFields(ctx, auth);
 
-      const createWithAuth = async (authMode) => {
-        try {
-          return await postTask(ctx, buildOps(ctx, title, effort, hourFields), authMode);
-        } catch (err) {
-          if (hourFields.length <= 1) throw err;
-          return postTask(ctx, buildOps(ctx, title, effort, HOUR_FIELDS), authMode);
-        }
-      };
+      const createWithAuth = async (authMode) =>
+        postTask(ctx, buildOps(ctx, title, effort, hourFields), authMode);
 
       let created;
       try {
