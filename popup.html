@@ -7,32 +7,50 @@
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <header>
-      <div>
-        <p class="kicker">Child task</p>
-        <h1>ADO Quick Task</h1>
-      </div>
-      <button id="options" type="button" title="Settings">Settings</button>
-    </header>
+    <main class="app">
+      <header class="top">
+        <div>
+          <h1>Quick Task</h1>
+          <p class="sub">Child AWS Effort</p>
+        </div>
+        <button id="options" type="button" class="text-btn">Settings</button>
+      </header>
 
-    <section id="parent" class="parent" hidden>
-      <p id="parent-meta" class="meta"></p>
-      <p id="parent-title" class="parent-title"></p>
-    </section>
+      <p id="status" class="status" role="status">Looking up this work item…</p>
 
-    <p id="status" class="status" role="status"></p>
+      <section id="parent" class="field" hidden>
+        <span class="label">Parent work item</span>
+        <p id="parent-title" class="value heading"></p>
+        <p id="parent-meta" class="value note"></p>
+      </section>
 
-    <form id="form" hidden>
-      <p class="meta">Task title</p>
-      <p id="task-title" class="preview"></p>
-      <label>
-        Effort
-        <input id="effort" type="number" min="0" step="any" required />
-      </label>
-      <button id="submit" type="submit">Create child task</button>
-    </form>
+      <form id="form" hidden>
+        <div class="field">
+          <span class="label">Task title</span>
+          <p id="task-title" class="value readonly"></p>
+        </div>
 
-    <p id="created" class="created" hidden></p>
+        <label class="field" for="effort">
+          <span class="label">Effort (hours)</span>
+          <span class="input-wrap">
+            <input
+              id="effort"
+              type="number"
+              min="0"
+              step="any"
+              required
+              placeholder="0"
+              inputmode="decimal"
+            />
+            <span class="suffix">hrs</span>
+          </span>
+        </label>
+
+        <button id="submit" type="submit">Create child task</button>
+      </form>
+
+      <p id="created" class="created" hidden></p>
+    </main>
     <script src="popup.js"></script>
   </body>
 </html>

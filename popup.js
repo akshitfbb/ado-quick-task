@@ -44,8 +44,8 @@ const callPage = async (tabId, method, payload) => {
 
 const fillParent = (ctx) => {
   $("parent").hidden = false;
-  $("parent-meta").textContent = `${ctx.type} ${ctx.id} · ${ctx.state}`;
   $("parent-title").textContent = ctx.title;
+  $("parent-meta").textContent = `${ctx.type} ${ctx.id} · ${ctx.state}`;
   $("task-title").textContent = ctx.childTitle;
   $("form").hidden = false;
   $("effort").focus();
@@ -64,7 +64,7 @@ const showCreated = (result) => {
     chrome.tabs.create({ url: result.htmlUrl });
   });
   el.append(link);
-  el.append(` · ${result.title} · Effort ${result.effort}`);
+  el.append(` · ${result.title} · ${result.effort} hrs`);
 };
 
 const loadContext = async () => {
@@ -86,7 +86,7 @@ const loadContext = async () => {
     setStatus("This item is already a Task. Child tasks are often rejected.");
     return;
   }
-  setStatus("Enter effort and create the child Task.");
+  setStatus("Enter effort hours, then create the child task.");
 };
 
 $("form").addEventListener("submit", async (event) => {

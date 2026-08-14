@@ -7,25 +7,34 @@
     <style>
       body {
         width: auto;
+        min-width: 360px;
         max-width: 440px;
       }
     </style>
   </head>
   <body>
-    <h1>Settings</h1>
-    <p class="meta">
-      Uses your Azure DevOps login from the ticket tab. Add a PAT only if create
-      fails with 401/403.
-    </p>
-    <form id="form">
-      <label>
-        Personal access token <span class="optional">optional</span>
-        <input id="pat" type="password" autocomplete="off" />
-      </label>
-      <p class="meta">Scope: Work Items (Read, Write). Stored only on this computer.</p>
-      <button id="submit" type="submit">Save</button>
-    </form>
-    <p id="status" class="status" role="status"></p>
+    <main class="app">
+      <header class="top">
+        <div>
+          <h1>Settings</h1>
+          <p class="sub">Azure DevOps auth</p>
+        </div>
+      </header>
+      <p class="status">
+        Uses your login from the ticket tab. Add a token only if create fails with 401/403.
+      </p>
+      <form id="form">
+        <label class="field" for="pat">
+          <span class="label">Personal access token <span class="optional">(optional)</span></span>
+          <span class="input-wrap">
+            <input id="pat" type="password" autocomplete="off" placeholder="Paste token" />
+          </span>
+        </label>
+        <p class="value note">Scope: Work Items (Read, Write). Stored only on this computer.</p>
+        <button id="submit" type="submit">Save token</button>
+      </form>
+      <p id="status" class="status" role="status"></p>
+    </main>
     <script src="options.js"></script>
   </body>
 </html>

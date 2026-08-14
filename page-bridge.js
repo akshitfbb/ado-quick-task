@@ -2,10 +2,9 @@
   const API = "7.1";
   const TASK_TYPE = "Task";
   const TITLE_SUFFIX = "AWS Effort";
-  const FALLBACK_EFFORT_FIELDS = [
-    "Microsoft.VSTS.Scheduling.Effort",
-    "Microsoft.VSTS.Scheduling.RemainingWork",
+  const HOUR_FIELDS = [
     "Microsoft.VSTS.Scheduling.OriginalEstimate",
+    "Microsoft.VSTS.Scheduling.RemainingWork",
   ];
 
   const parseLocation = (href = location.href) => {
@@ -121,34 +120,52 @@
     };
   };
 
-  const resolveEffortField = async (ctx, auth) => {
-    try {
-      const type = await adoFetch(
-        `${apiBase(ctx.org)}/${encodeURIComponent(ctx.project)}/_apis/wit/workitemtypes/${encodeURIComponent(TASK_TYPE)}?api-version=${API}`,
-        {},
-        auth
-      );
-      const fields = type.fields || [];
-      const match =
-        fields.find((f) => /^effort$/i.test(f.name)) ||
-        fields.find((f) => /\.effort$/i.test(f.referenceName || ""));
-      if (match?.referenceName) return match.referenceName;
-    } catch {
-      // Use fallbacks below.
-    }
-    return FALLBACK_EFFORT_FIELDS[0];
+  const listTypeFields = (payload) => {
+    const raw = payload?.value || payload?.fields || [];
+    if (Array.isArray(raw)) return raw;
+    return Object.entries(raw).map(([referenceName, field]) => ({
+      referenceName: field?.referenceName || referenceName,
+      name: field?.name || referenceName,
+    }));
   };
 
-  const buildOps = (ctx, title, effort, effortField) => {
-    const ops = [
-      { op: "add", path: "/fields/System.Title", value: title },
-      { op: "add", path: `/fields/${effortField}`, value: effort },
-      {
-        op: "add",
-        path: "/relations/-",
-        value: { rel: "System.LinkTypes.Hierarchy-Reverse", url: ctx.url },
-      },
-    ];
+  const isHourField = (field) => {
+    const name = String(field.name || "").trim();
+    const ref = String(field.referenceName || "");
+    if (HOUR_FIELDS.includes(ref)) return true;
+    if (/effort\s*\(\s*hours?\s*\)/i.test(name)) return true;
+    if (/^original estimate$/i.test(name)) return true;
+    if (/^remaining( work)?$/i.test(name)) return true;
+    return false;
+  };
+
+  const resolveHourFields = async (ctx, auth) => {
+    const base = `${apiBase(ctx.org)}/${encodeURIComponent(ctx.project)}/_apis/wit/workitemtypes/${encodeURIComponent(TASK_TYPE)}`;
+    try {
+      let payload;
+      try {
+        payload = await adoFetch(`${base}/fields?api-version=${API}`, {}, auth);
+      } catch {
+        payload = await adoFetch(`${base}?api-version=${API}`, {}, auth);
+      }
+      const refs = [...new Set(listTypeFields(payload).filter(isHourField).map((f) => f.referenceName).filter(Boolean))];
+      if (refs.length) return refs;
+    } catch {
+      // Use the standard Effort (Hours) fields.
+    }
+    return [...HOUR_FIELDS];
+  };
+
+  const buildOps = (ctx, title, effort, hourFields) => {
+    const ops = [{ op: "add", path: "/fields/System.Title", value: title }];
+    hourFields.forEach((field) => {
+      ops.push({ op: "add", path: `/fields/${field}`, value: effort });
+    });
+    ops.push({
+      op: "add",
+      path: "/relations/-",
+      value: { rel: "System.LinkTypes.Hierarchy-Reverse", url: ctx.url },
+    });
     if (ctx.areaPath) {
       ops.push({ op: "add", path: "/fields/System.AreaPath", value: ctx.areaPath });
     }
@@ -185,22 +202,15 @@
       const title = childTitle(ctx.id);
       const token = await sessionToken(ctx.org);
       let auth = token ? { token } : {};
-      const preferredField = await resolveEffortField(ctx, auth);
-      const fieldsToTry = [
-        preferredField,
-        ...FALLBACK_EFFORT_FIELDS.filter((name) => name !== preferredField),
-      ];
+      const hourFields = await resolveHourFields(ctx, auth);
 
       const createWithAuth = async (authMode) => {
-        let lastError;
-        for (const field of fieldsToTry) {
-          try {
-            return await postTask(ctx, buildOps(ctx, title, effort, field), authMode);
-          } catch (err) {
-            lastError = err;
-          }
+        try {
+          return await postTask(ctx, buildOps(ctx, title, effort, hourFields), authMode);
+        } catch (err) {
+          if (hourFields.length <= 1) throw err;
+          return postTask(ctx, buildOps(ctx, title, effort, HOUR_FIELDS), authMode);
         }
-        throw lastError;
       };
 
       let created;
